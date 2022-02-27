@@ -27,6 +27,8 @@ ident = lambda arg: arg
 is_seq = lambda obj: isinstance(obj, (list, tuple))
 is_col = lambda obj: isinstance(obj, (list, tuple, set, frozenset))
 kilo = lambda n=1: pow(1024, n)
+log2 = math.log2
+log10 = math.log10
 noop = lambda *args, **kwargs: None
 pdir = lambda o: [i for i in dir(o) if not i.startswith('_')]
 print_lines = lambda *s, **kw: print(*s, **kw, sep='\n')
