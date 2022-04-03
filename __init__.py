@@ -21,6 +21,7 @@ home_dir = os.path.expanduser('~').replace('\\', '/').replace('C:', '')
 cd = lambda p=home_dir: os.chdir(p)
 d60 = lambda n: divmod(n, 60)
 d64 = lambda n: divmod(n, 64)
+dm = divmod
 fact = math.factorial
 get_default = lambda l, i, d=None: l[i] if len(l) > i else d
 ident = lambda arg: arg
