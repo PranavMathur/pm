@@ -477,7 +477,8 @@ class Quitter:
     def __call__(self, code=None):
         if self.func:
             self.func()
-        print()
+        if not sys.platform.startswith('linux'):
+            print()
         try:
             sys.stdin.close()
         except:
