@@ -3,8 +3,10 @@ import re
 import sys
 import json
 import math
+import time
 import pickle
 import random
+import datetime
 import operator as op
 import functools as ft
 import itertools as it
@@ -28,6 +30,7 @@ ident = lambda arg: arg
 is_seq = lambda obj: isinstance(obj, (list, tuple))
 is_col = lambda obj: isinstance(obj, (list, tuple, set, frozenset))
 kilo = lambda n=1: pow(1024, n)
+log = math.log
 log2 = math.log2
 log10 = math.log10
 noop = lambda *args, **kwargs: None
@@ -39,6 +42,7 @@ pwd = lambda: os.getcwd().replace('\\', '/')
 rand_elem = lambda l, n=None: random.sample(l, n) if n else random.choice(l)
 shuffle = random.shuffle
 sortset = lambda l: sorted(set(l))
+sqrt = math.sqrt
 starmap = lambda *args: list(it.starmap(*args))
 strip_nums = lambda s, invert=False: ''.join(c for c in s if (c.isalpha() ^ invert))
 tup = tpl = lambda o: (o,)
@@ -130,6 +134,18 @@ def filter_counter(c, threshold=1):
 def count_dups(itr):
     c = Counter(itr)
     return filter_counter(c)
+
+def get_all_longest(it):
+    m_len = 0
+    ret = []
+    for elem in it:
+        l = len(elem)
+        if l > m_len:
+            m_len = l
+            ret = [elem]
+        elif l == m_len:
+            ret.append(elem)
+    return ret
 
 def eat(iterator, n=None):
     if n is None:

@@ -149,6 +149,7 @@ def list_files(loc='.', end='', recursive=False):
                 if check_end(i)]
 
 ls = list_files
+ls_files = list_files
 file_exists = os.path.exists
 is_file = os.path.isfile
 is_dir = os.path.isdir
