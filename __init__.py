@@ -408,29 +408,38 @@ class Sentinel:
 
 class Getter:
     _sentinel = Sentinel()
-    __slots__ = ('__names')
-    def __init__(self, names=tuple()):
+    __slots__ = ('__names', '__default')
+    def __init__(self, names=tuple(), default=_sentinel):
         self.__names = tuple(names)
+        self.__default = default
     def __getattr__(self, arg):
         tup = (*self.__names, (arg, 'attr'))
-        return Getter(tup)
+        return Getter(tup, self.__default)
     def __getitem__(self, arg):
         tup = (*self.__names, (arg, 'item'))
-        return Getter(tup)
+        return Getter(tup, self.__default)
     def __neg__(self):
         return self.__getattr__('__neg__')()
-    def __call__(self, obj=_sentinel, *, args=tuple(), kwargs=dict()):
+    def __call__(self, obj=_sentinel, *, default=_sentinel, args=tuple(), kwargs=dict()):
+        if default is not Getter._sentinel:
+            return Getter(self.__names, default)
         if obj is Getter._sentinel:
             tup = ((args, kwargs), 'func')
-            return Getter(self.__names + (tup,))
+            return Getter(self.__names + (tup,), self.__default)
         for name, tpe in self.__names:
-            if tpe == 'attr':
-                obj = getattr(obj, name)
-            elif tpe == 'func':
-                _args, _kwargs = name
-                obj = obj(*_args, **_kwargs)
-            elif tpe == 'item':
-                obj = obj[name]
+            try:
+                if tpe == 'attr':
+                    obj = getattr(obj, name)
+                elif tpe == 'func':
+                    _args, _kwargs = name
+                    obj = obj(*_args, **_kwargs)
+                elif tpe == 'item':
+                    obj = obj[name]
+            except:
+                if self.__default is not Getter._sentinel:
+                    return self.__default
+                else:
+                    raise
         return obj
     def __eq__(self, other):
         if isinstance(other, Getter):
@@ -440,8 +449,10 @@ class Getter:
         return hash(self.__names)
     def __repr__(self):
         if not self.__names:
-            return '%s()' % self.__class__.__name__
+            return self.__class__.__name__
         rep = ['gtr']
+        if self.__default is not Getter._sentinel:
+            rep.append('{%r}' % self.__default)
         for name, tpe in self.__names:
             if tpe == 'attr':
                 rep.append('.' + name)
@@ -449,12 +460,12 @@ class Getter:
                 if rep[-1] == '.__neg__':
                     rep.pop()
                     rep.insert(0, '-')
-                    continue
-                args, kwargs = name
-                terms = [repr(i) for i in args]
-                terms += ['%s=%r' % tup for tup in kwargs.items()]
-                terms = ', '.join(terms)
-                rep.append(f'({terms})')
+                else:
+                    args, kwargs = name
+                    terms = [repr(i) for i in args]
+                    terms += ['%s=%r' % tup for tup in kwargs.items()]
+                    terms = ', '.join(terms)
+                    rep.append(f'({terms})')
             elif tpe == 'item':
                 if isinstance(name, slice):
                     idx = [name.start, name.stop, name.step]

@@ -148,6 +148,37 @@ def list_files(loc='.', end='', recursive=False):
                 for i in d[2]
                 if check_end(i)]
 
+def ls_iter(loc='.', end='', recursive=False):
+    if isinstance(end, (list, set)):
+        end = tuple(end)
+    def check_end(name):
+        return name.endswith(end)
+    loc = loc.rstrip('/')
+    if not file_exists(loc):
+        raise FileNotFoundError(loc)
+    if not recursive:
+        walk = os.walk(loc)
+        try:
+            (dirpath, dirnames, filenames) = next(walk)
+        except StopIteration:
+            raise FileNotFoundError(loc) from None
+        dirpath = dirpath.replace('\\', '/') + '/'
+        if dirpath == './':
+            dirpath = ''
+        for name in dirnames:
+            i = dirpath + name + "/"
+            if check_end(i):
+                yield i
+        for name in filenames:
+            i = dirpath + name
+            if check_end(i):
+                yield i
+    else:
+        for d in os.walk(loc):
+            for i in d[2]:
+                if check_end(i):
+                    yield d[0].replace('\\', '/') + '/' + i
+
 ls = list_files
 ls_files = list_files
 file_exists = os.path.exists

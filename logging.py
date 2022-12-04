@@ -10,6 +10,8 @@ QUIET = 25
 
 class Logger:
     def __init__(self, level, **kwargs):
+        if level is True:
+            level = VERBOSE
         self.level = level
         self.defaults = kwargs
     def log(self, level, *args, **kwargs):
