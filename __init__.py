@@ -193,6 +193,7 @@ def mean(seq):
     for num, i in enumerate(seq, 1):
         total += i
     return total/num
+avg = mean
 
 def median(data, key=None):
     data = sorted(data, key=key)

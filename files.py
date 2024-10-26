@@ -62,10 +62,14 @@ def read_json(filename, encoding=None, errors=None, var=False):
             return json.load(f)
     else:
         file = read_file(filename, encoding=encoding, errors=errors)
-        try:
-            file = re.search(r'((\[)|(\{)).*(?(2)\]|\})', file, re.S)[0]
-        except TypeError2:
-            raise ValueError(f'Could not find JSON in {filename}')
+        if '=' in file[:20]:
+            file = file[file.index('=')+1:]
+        if ';' in file[-20:]:
+            file = file[:file.rindex(';')]
+##        try:
+##            file = re.search(r'((\[)|(\{)).*(?(2)\]|\})', file, re.S)[0]
+##        except TypeError:
+##            raise ValueError(f'Could not find JSON in {filename}')
         return json.loads(file)
 
 def write_json(filename, obj, indent='\t', var=None, **kwargs):
