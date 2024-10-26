@@ -302,6 +302,20 @@ def skeleton(obj):
         return {key: skeleton(val) for (key, val) in obj.items()}
     return obj.__class__.__name__
 
+def string_distance(a, b):
+    dists = [[0 for j in range(len(b))] for i in range(len(a))]
+    for i in range(len(a)):
+        for j in range(len(b)):
+            if j == 0:
+                dists[i][j] = i
+            elif i == 0:
+                dists[i][j] = j
+            elif a[i] == b[i]:
+                dists[i][j] = dists[i-1][j-1]
+            else:
+                dists[i][j] = 1 + min(dists[i-1][j], dists[i][j-1], dists[i-1][j-1])
+    return dists[len(a)-1][len(b)-1]
+
 def gen_dunder(attr, method):
     method = '__%s__' % method
     def func(self, *args, **kwargs):
